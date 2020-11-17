@@ -3,3 +3,6 @@ ignore = E203, E266, E501, E731, W503
 max-line-length = 80
 select = B,C,E,F,W,T4,B9
 exclude = setup.py
+statistics = true
+count = true
+show_source = true
