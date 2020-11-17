@@ -16,6 +16,8 @@ jobs:
         run: python -c "import sys; print(sys.version)"
       - name: Python location
         run: echo "Python location ${{ env.pythonLocation }}"
+      - name: What is at python location
+        run: ls ${{ env.pythonLocation }}"
       #- name: Cache pip
       #  uses: actions/cache@v2
       #  with:
