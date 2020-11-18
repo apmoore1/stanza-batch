@@ -74,7 +74,7 @@ def test__stanza_batch() -> None:
 
 
 def test__batch_to_documents() -> None:
-    nlp = stanza.Pipeline(lang="en", processors="tokenize")
+    nlp = stanza.Pipeline(lang="en", processors="tokenize", use_gpu=False)
     # One sample
     count = 0
     for batch, offsets, document_index in stanza_batch._stanza_batch(
@@ -192,7 +192,7 @@ def test__batch_to_documents() -> None:
 
 
 def test_combine_stanza_documents() -> None:
-    nlp = stanza.Pipeline(lang="en", processors="tokenize")
+    nlp = stanza.Pipeline(lang="en", processors="tokenize", use_gpu=False)
     document_one = nlp(EXAMPLE_ONE)
     document_two = nlp(EXAMPLE_TWO)
     # Two documents combined
@@ -214,7 +214,7 @@ def test_combine_stanza_documents() -> None:
 
 
 def test_batch() -> None:
-    nlp = stanza.Pipeline(lang="en", processors="tokenize")
+    nlp = stanza.Pipeline(lang="en", processors="tokenize", use_gpu=False)
     # One sample
     count = 0
     for document in stanza_batch.batch([EXAMPLE_ONE], nlp):
