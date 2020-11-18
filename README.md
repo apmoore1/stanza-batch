@@ -1,4 +1,13 @@
 # stanza-batch
+
+<p align="center">
+    <a href="https://github.com/apmoore1/stanza-batch/actions?query=workflow%3Atest-action"> <img alt="CI" src="https://github.com/apmoore1/stanza-batch/workflows/test-action/badge.svg"></a>
+    <a href="https://codecov.io/gh/apmoore1/stanza-batch"> <img alt="Codecov" src="https://codecov.io/gh/apmoore1/stanza-batch/branch/main/graph/badge.svg"></a>
+    <a href="https://github.com/apmoore1/stanza-batch/blob/main/LICENSE"> <img alt="License" src="https://img.shields.io/github/license/apmoore1/stanza-batch"></a>
+</p>
+
+)
+
 Is a batching utility for [Stanza](https://github.com/stanfordnlp/stanza) making processing documents/texts with Stanza quicker and easier. The current recommendation for batching by [Stanza is to concatenate documents together with each document separated by a blank line (`\n\n`)](https://github.com/stanfordnlp/stanza#batching-to-maximize-pipeline-speed). This way of batching has one main drawback:
 
 1. The return of processing this document is one Stanza Document with lots of sentences, thus you don't know where one document ends and another starts, easily.
