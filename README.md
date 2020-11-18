@@ -1,7 +1,7 @@
 # stanza-batch
 
 <p align="center">
-    <a href="https://github.com/apmoore1/stanza-batch/actions?query=workflow%3Atest-action"> <img alt="CI" src="https://github.com/apmoore1/stanza-batch/workflows/test-action/badge.svg?event=push&branch=master"></a>
+    <a href="https://github.com/apmoore1/stanza-batch/actions?query=workflow%3Atest-action"> <img alt="CI" src="https://github.com/apmoore1/stanza-batch/workflows/test-action/badge.svg?event=push&branch=main"></a>
     <a href="https://codecov.io/gh/apmoore1/stanza-batch"> <img alt="Codecov" src="https://codecov.io/gh/apmoore1/stanza-batch/branch/main/graph/badge.svg"></a>
     <a href="https://github.com/apmoore1/stanza-batch/blob/main/LICENSE"> <img alt="License" src="https://img.shields.io/github/license/apmoore1/stanza-batch"></a>
 </p>
