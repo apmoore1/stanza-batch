@@ -16,23 +16,23 @@ jobs:
         run: python -c "import sys; print(sys.version)"
       - name: Python location
         run: echo "Python location ${{ env.pythonLocation }}"
-      - name: What is at python location
-        run: ls ${{ env.pythonLocation }}
-      #- name: Cache pip
-      #  uses: actions/cache@v2
-      #  with:
-      #    path: ~/.cache/pip # Ubuntu specific  
-          # Do not need to cache the dev requirements as they are small
-      #    key: ${{ runner.os }}-${{ matrix.python-version }}-pip-${{ hashFiles('**/requirements.txt') }}
-      #- name: Install dependencies
-      #  run: |
-      #  python -m pip install --upgrade pip
-      #  pip install -r requirements.txt
-      #  pip install -r dev-requirements.txt
-      #- name: Code format
-      #  run: |
-      #  black --check-code --line-length 80 .
-      #  flake8 .
-      #  mypy
-      #- name: Pytest and code coverage
-      #  run: python -m pytest --cov=stanza_batch --cov-report term-missing
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip # Ubuntu specific  
+          # cache both the dev and standard requirements
+          key: ${{ runner.os }}-${{ env.pythonLocation }}-pip-${{ hashFiles('**/*requirements.txt') }}
+      - name: Install dependencies
+        # We want the pips to be upgraded when a new version comes out so that
+        # the packages do not use stale dependencies from the cache.
+        run: |
+        python -m pip install --upgrade pip
+        pip install --upgrade --upgrade-strategy eager -r requirements.txt
+        pip install --upgrade --upgrade-strategy eager -r dev-requirements.txt
+      - name: Code format
+        run: |
+        black --check-code --line-length 80 .
+        flake8 .
+        mypy
+      - name: Pytest and code coverage
+        run: python -m pytest --cov=stanza_batch --cov-report term-missing
