@@ -13,6 +13,8 @@ document_1 = 'Hello how are you\n\nI am good thank you'
 document_2 = 'This is a different document'
 # Create the document batch
 batch_document = '\n\n'.join([document_1, document_2])
+# Download Stanza English model
+stanza.download("en")
 # stanza model
 nlp = stanza.Pipeline(lang="en", processors="tokenize",)
 stanza_batch = nlp(batch_document)
@@ -58,6 +60,8 @@ As we only keep track of token offsets any whitespace at the start or end of doc
 ```python
 import stanza
 from stanza_batch import batch
+# Download Stanza English model
+stanza.download("en")
 # stanza model
 nlp = stanza.Pipeline(lang="en", processors="tokenize",)
 document_1 = '\n  Hello how are you\n\nI am good thank you  \n'
@@ -71,6 +75,8 @@ The batching approach does not actually split on `\n\n` it actually makes use of
 ```python
 import stanza
 from stanza_batch import batch
+# Download Stanza English model
+stanza.download("en")
 # stanza model
 nlp = stanza.Pipeline(lang="en", processors="tokenize",)
 document_1 = 'Hello how are you\n \n \nI am good thank you'
@@ -104,6 +110,8 @@ with emma_fp.open('r') as emma_file:
 # Make the text much larger to cause OOM
 jane_austin_data = jane_austin_data * 5
 assert len(jane_austin_data) == 2450
+# Download Stanza English model
+stanza.download("en")
 # We set the initial batchsize as 500 and add POS and NER tagging
 nlp = stanza.Pipeline(lang="en", processors="tokenize,pos,ner", 
                       tokenize_batch_size=500,
