@@ -17,6 +17,7 @@ jobs:
       - name: Display Python version
         run: |
           PYTHON=`python -c "import sys; print('.'.join([str(version) for version in sys.version_info[:3]]))"`
+          export PYTHON
           echo $PYTHON
       
       - name: Python location
