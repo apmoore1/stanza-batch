@@ -23,7 +23,7 @@ jobs:
       - name: Cache pip
         uses: actions/cache@v2
         with:
-          path: ~/.cache/pip # Ubuntu specific  
+          path: ${{ env.pythonLocation }} # Ubuntu specific  
           # cache both the dev and standard requirements
           key: ${{ runner.os }}-${{ env.pythonLocation }}-pip-${{ hashFiles('**/*requirements.txt') }}
       
