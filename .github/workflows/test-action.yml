@@ -31,7 +31,7 @@ jobs:
           pip install --upgrade --upgrade-strategy eager -r dev-requirements.txt
       - name: Code format
         run: |
-          black --check-code --line-length 80 .
+          black --check --line-length 80 .
           flake8 .
           mypy
       - name: Pytest and code coverage
