@@ -215,9 +215,28 @@ def test_combine_stanza_documents() -> None:
     assert sentence_count == 5
 
 
+def test_sentiment_in_sentence() -> None:
+    stanza.download("en", processors="tokenize, sentiment")
+    nlp = stanza.Pipeline(lang="en", processors="tokenize", use_gpu=False)
+    # without sentiment
+    for document in stanza_batch.batch([EXAMPLE_ONE], nlp):
+        for sentence in document.sentences:
+            with pytest.raises(AttributeError):
+                sentence.sentiment
+    # with sentiment
+    nlp = stanza.Pipeline(
+        lang="en", processors="tokenize, sentiment", use_gpu=False
+    )
+    for document in stanza_batch.batch([EXAMPLE_ONE], nlp):
+        for sentence in document.sentences:
+            assert isinstance(sentence.sentiment, int)
+
+
 def test_batch() -> None:
     stanza.download("en", processors="tokenize")
-    nlp = stanza.Pipeline(lang="en", processors="tokenize", use_gpu=False)
+    nlp = stanza.Pipeline(
+        lang="en", processors="tokenize, sentiment", use_gpu=False
+    )
     # One sample
     count = 0
     for document in stanza_batch.batch([EXAMPLE_ONE], nlp):
@@ -233,6 +252,7 @@ def test_batch() -> None:
                     document_text[token.start_char : token.end_char]
                     == token.text
                 )
+            assert isinstance(sentence.sentiment, int)
     assert count == 1
     # One sample where the sample is split into three due to `\n\n` in the
     # middle of the string.
@@ -253,6 +273,7 @@ def test_batch() -> None:
                     document_text[token.start_char : token.end_char]
                     == token.text
                 )
+            assert isinstance(sentence.sentiment, int)
     assert count == 1
     # Multiple samples
     text_dict = {
@@ -275,6 +296,7 @@ def test_batch() -> None:
                     document_text[token.start_char : token.end_char]
                     == token.text
                 )
+            assert isinstance(sentence.sentiment, int)
     assert count == len(documents)
     # One text across 3 batches
     long_text = "\nHi\n\nNice to meet you\n   \n \nIt is a nice day\n\nBut it could be warmer\n    \nBye!\n\n \n\n"
@@ -294,6 +316,7 @@ def test_batch() -> None:
                     document_text[token.start_char : token.end_char]
                     == token.text
                 )
+            assert isinstance(sentence.sentiment, int)
     assert count == 1
 
     # Real world type of test across a number of samples from the Jane Austin
@@ -321,3 +344,4 @@ def test_batch() -> None:
                     processed_text[token.start_char : token.end_char]
                     == token.text
                 )
+            assert isinstance(sentence.sentiment, int)
