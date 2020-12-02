@@ -4,6 +4,7 @@ import re
 import stanza
 from stanza.models.common.doc import Document, Sentence
 from stanza.models.tokenize.data import NEWLINE_WHITESPACE_RE
+import torch
 
 # NEWLINE_WHITESPACE_RE = re.compile(r'\n\s*\n') That is what NEWLINE_WHITESPACE_RE
 # is within Stanza
@@ -94,6 +95,19 @@ def _stanza_batch(
         yield batch_str, document_offsets, document_indexes
 
 
+def _create_stanza_document(
+    sentence_dicts: List[List[Dict[str, str]]], document_text: str
+) -> Document:
+    stanza_document = Document(sentence_dicts, text=document_text)
+    for sentence_index, sentence_dict in enumerate(sentence_dicts):
+        sentence_sentiment = sentence_dict[0]["sentence_sentiment"]
+        if sentence_sentiment is not None:
+            stanza_document.sentences[
+                sentence_index
+            ].sentiment = sentence_sentiment
+    return stanza_document
+
+
 def _batch_to_documents(
     processed_batch: Document,
     document_offsets: List[int],
@@ -129,12 +143,14 @@ def _batch_to_documents(
         all_sentence_dicts: List[List[Dict[str, str]]] = []
         for sentence in relevant_sentences:
             sentence_dicts: List[Dict[str, str]] = []
+            sentence_sentiment = getattr(sentence, "sentiment", None)
             for token in sentence.to_dict():
                 token_misc = token["misc"]
                 start, end = _start_end_character_offsets(token_misc)
                 start = start - start_offset
                 end = end - start_offset
                 token["misc"] = f"start_char={start}|end_char={end}"
+                token["sentence_sentiment"] = sentence_sentiment
                 sentence_dicts.append(token)
             all_sentence_dicts.append(sentence_dicts)
         return all_sentence_dicts
@@ -185,7 +201,9 @@ def _batch_to_documents(
                 document_sentence_dicts = change_offsets(
                     document_sentences, start
                 )
-                document = Document(document_sentence_dicts, text=document_text)
+                document = _create_stanza_document(
+                    document_sentence_dicts, document_text
+                )
 
                 batch_documents.append(document)
                 batch_document_indexes.append(current_document)
@@ -204,7 +222,9 @@ def _batch_to_documents(
             start, _ = get_start_end_offset(previous_document_sentences)
         document_sentences.extend(previous_document_sentences)
         document_sentence_dicts = change_offsets(document_sentences, start)
-        document = Document(document_sentence_dicts, text=document_text)
+        document = _create_stanza_document(
+            document_sentence_dicts, document_text
+        )
         batch_documents.append(document)
         batch_document_indexes.append(current_document)
         document_text = ""
@@ -228,12 +248,14 @@ def combine_stanza_documents(stanza_documents: List[Document]) -> Document:
         all_sentence_dicts: List[List[Dict[str, str]]] = []
         for sentence in relevant_sentences:
             sentence_dicts: List[Dict[str, str]] = []
+            sentence_sentiment = getattr(sentence, "sentiment", None)
             for token in sentence.to_dict():
                 token_misc = token["misc"]
                 start, end = _start_end_character_offsets(token_misc)
                 start = start + offset_to_add
                 end = end + offset_to_add
                 token["misc"] = f"start_char={start}|end_char={end}"
+                token["sentence_sentiment"] = sentence_sentiment
                 sentence_dicts.append(token)
             all_sentence_dicts.append(sentence_dicts)
         return all_sentence_dicts
@@ -252,11 +274,14 @@ def combine_stanza_documents(stanza_documents: List[Document]) -> Document:
             new_document_text += f"{document_text}\n\n"
         character_offset_to_add = len(new_document_text)
 
-    return Document(new_sentences, text=new_document_text)
+    return _create_stanza_document(new_sentences, new_document_text)
 
 
 def batch(
-    data: Iterable[str], stanza_pipeline: stanza.Pipeline, batch_size: int = 32
+    data: Iterable[str],
+    stanza_pipeline: stanza.Pipeline,
+    batch_size: int = 32,
+    clear_cache: bool = True,
 ) -> Iterable[Document]:
     """
     Batch processes the given texts using the given Stanza pipeline.
@@ -276,6 +301,11 @@ def batch(
     :param data: A list/iterable of texts you want processing.
     :param stanza_pipeline: The Stanza pipeline used to process the texts.
     :param batch_size: The number of texts to process at one time.
+    :param clear_cache: If True will call the python garbage collector and if
+                        using the GPU will empty the CUDA cache after each
+                        batch has been processed. This is to stop the memory
+                        from being consumed for both the main memory and GPU
+                        memory over the whole python process.
     :returns: An Iterable of processed texts represented as Stanza Documents.
               This will be of the same length as the data iterable given.
     :raises ValueError: If a sample in the data contains no text after being
@@ -322,5 +352,9 @@ def batch(
                 documents_across_batches.append(processed_stanza_document)
             else:
                 yield processed_stanza_document
+        if clear_cache and torch.cuda.is_available():
+            torch.cuda.empty_cache()
     if documents_across_batches:
         yield combine_stanza_documents(documents_across_batches)
+    if clear_cache and torch.cuda.is_available():
+        torch.cuda.empty_cache()

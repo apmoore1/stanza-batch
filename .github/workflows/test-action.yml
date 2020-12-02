@@ -40,7 +40,7 @@ jobs:
       
       - name: Code format
         run: |
-          black --check --line-length 80 .
+          black --exclude profile_stanza.py --check --line-length 80 .
           flake8 .
           mypy
   

@@ -215,12 +215,34 @@ def test_combine_stanza_documents() -> None:
     assert sentence_count == 5
 
 
-def test_batch() -> None:
-    stanza.download("en", processors="tokenize")
+def test_sentiment_in_sentence() -> None:
+    stanza.download("en", processors="tokenize, sentiment")
     nlp = stanza.Pipeline(lang="en", processors="tokenize", use_gpu=False)
+    # without sentiment
+    for document in stanza_batch.batch([EXAMPLE_ONE], nlp):
+        for sentence in document.sentences:
+            with pytest.raises(AttributeError):
+                sentence.sentiment
+    # with sentiment
+    nlp = stanza.Pipeline(
+        lang="en", processors="tokenize, sentiment", use_gpu=False
+    )
+    for document in stanza_batch.batch([EXAMPLE_ONE], nlp):
+        for sentence in document.sentences:
+            assert isinstance(sentence.sentiment, int)
+
+
+@pytest.mark.parametrize("clear_cache", [(True,), (False,)])
+def test_batch(clear_cache: bool) -> None:
+    stanza.download("en", processors="tokenize")
+    nlp = stanza.Pipeline(
+        lang="en", processors="tokenize, sentiment", use_gpu=False
+    )
     # One sample
     count = 0
-    for document in stanza_batch.batch([EXAMPLE_ONE], nlp):
+    for document in stanza_batch.batch(
+        [EXAMPLE_ONE], nlp, clear_cache=clear_cache
+    ):
         count += 1
         # This process removes the \n either side of the string
         assert document.text == "Hello how are you"
@@ -233,11 +255,14 @@ def test_batch() -> None:
                     document_text[token.start_char : token.end_char]
                     == token.text
                 )
+            assert isinstance(sentence.sentiment, int)
     assert count == 1
     # One sample where the sample is split into three due to `\n\n` in the
     # middle of the string.
     count = 0
-    for document in stanza_batch.batch([EXAMPLE_FOUR], nlp):
+    for document in stanza_batch.batch(
+        [EXAMPLE_FOUR], nlp, clear_cache=clear_cache
+    ):
         count += 1
         # This process removes the `\n \n\n` and adds `\n\n` in its place.
         assert (
@@ -253,6 +278,7 @@ def test_batch() -> None:
                     document_text[token.start_char : token.end_char]
                     == token.text
                 )
+            assert isinstance(sentence.sentiment, int)
     assert count == 1
     # Multiple samples
     text_dict = {
@@ -264,7 +290,9 @@ def test_batch() -> None:
     documents = [EXAMPLE_ONE, EXAMPLE_THREE, EXAMPLE_FOUR, EXAMPLE_ONE]
     count = 0
     for index, document in enumerate(
-        stanza_batch.batch(documents, nlp, batch_size=2)
+        stanza_batch.batch(
+            documents, nlp, batch_size=2, clear_cache=clear_cache
+        )
     ):
         count += 1
         document_text = document.text
@@ -275,12 +303,15 @@ def test_batch() -> None:
                     document_text[token.start_char : token.end_char]
                     == token.text
                 )
+            assert isinstance(sentence.sentiment, int)
     assert count == len(documents)
     # One text across 3 batches
     long_text = "\nHi\n\nNice to meet you\n   \n \nIt is a nice day\n\nBut it could be warmer\n    \nBye!\n\n \n\n"
     count = 0
     for index, document in enumerate(
-        stanza_batch.batch([long_text], nlp, batch_size=2)
+        stanza_batch.batch(
+            [long_text], nlp, batch_size=2, clear_cache=clear_cache
+        )
     ):
         count += 1
         document_text = document.text
@@ -294,6 +325,7 @@ def test_batch() -> None:
                     document_text[token.start_char : token.end_char]
                     == token.text
                 )
+            assert isinstance(sentence.sentiment, int)
     assert count == 1
 
     # Real world type of test across a number of samples from the Jane Austin
@@ -308,7 +340,10 @@ def test_batch() -> None:
 
     processed_book_data: List[Document] = []
     processed_book_data = [
-        document for document in stanza_batch.batch(book_data, nlp)
+        document
+        for document in stanza_batch.batch(
+            book_data, nlp, clear_cache=clear_cache
+        )
     ]
     assert len(book_data) == len(processed_book_data)
     for true_data, processed_data in zip(book_data, processed_book_data):
@@ -321,3 +356,4 @@ def test_batch() -> None:
                     processed_text[token.start_char : token.end_char]
                     == token.text
                 )
+            assert isinstance(sentence.sentiment, int)
