@@ -143,10 +143,108 @@ pip install -r dev-requirements.txt
 
 To use black, flake8, mypy, and pytest use the following commands:
 ``` bash
-black --line-length 80 .
+black --exclude profile_stanza.py --line-length 80 .
 flake8 .
 mypy
 python -m pytest --cov=stanza_batch --cov-report term-missing
 ```
 
 The flake8, mypy, and pytest have to pass whereby the pytest test coverage should be 100% for a pull request to be accepted. If these requirements are not met in your pull request we will work with you to resolve any issues, so please do not get put off creating a pull request if you cannot pass any/all of these requirements.
+
+## Memory management
+
+One of the arguments to `batch` is `clear_cache` which clears the GPU memory after every batch. This is important as Python often does not clear this up quickly this can quickly cause an Out Of Memory (OOM) problem. Below we profile the `batch` function using `clear_cache` and not. For this we use [gputil](https://github.com/anderskm/gputil):
+```python
+import argparse
+from pathlib import Path
+from typing import List
+from time import time
+from pathlib import Path
+
+import stanza
+from stanza.models.common.doc import Document
+import stanza_batch
+import GPUtil
+import matplotlib.pyplot as plt
+
+def path_type(fp: str) -> Path:
+    return Path(fp).resolve()
+
+if __name__ == "__main__":
+    save_fp_help = ('File path to save the GPU memory as a '
+                    'function of documents processed plot. '
+                    'As we have to get the GPU memory usage for each '
+                    'document this slows the program down a lot.')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--save-fp', help=save_fp_help, type=path_type)
+    parser.add_argument('--clear-cache', action='store_true')
+    args = parser.parse_args()
+
+    stanza.download("en", processors="tokenize,pos,sentiment")
+    nlp = stanza.Pipeline(
+        lang="en", processors="tokenize,pos,sentiment", use_gpu=True
+    )
+
+    book_data: List[str] = []
+    test_data_dir = Path(__file__, "..", "tests", "data").resolve()
+    with Path(test_data_dir, "jane_austin_emma_data.txt").open(
+        "r"
+    ) as emma_file:
+        book_data = [line for line in emma_file]
+    assert len(book_data) == 490
+
+    t = time()
+    gpu_memory_used: List[float] = []
+    processed_book_data: List[Document] = []
+    for document in stanza_batch.batch(book_data, nlp, clear_cache=args.clear_cache):
+        processed_book_data.append(document)
+        if args.save_fp:
+            # assuming the first GPU is the one being used.
+            gpu_memory_used.append(GPUtil.getGPUs()[0].memoryUsed)
+    print(f'Time taken: {time() - t}')
+
+    if args.save_fp:
+        number_documents_processed = range(len(processed_book_data))
+        plt.plot(number_documents_processed, gpu_memory_used)
+        plt.xlabel('Number of documents processed')
+        plt.ylabel('GPU Memory used (MB)')
+        plt.grid(True)
+        plt.savefig(str(args.save_fp))
+```
+
+To run the following need to install `gputil`:
+```bash
+pip install "gputil>=1.4.0"
+```
+
+As we can see below using the `clear_cache` does uses less memory overall and has a lower maximum GPU memory usage, there is a slight time plenty of 2% but that could be due to other factors and is marginal compared to the memory difference of maximum GPU usage of <3200MB for `clear_cache` compared to just over 3400MB for not using `clear_cache` (at least 6% difference). Furthermore the `clear_cache` does not accumulate GPU memory thus over a larger job the memory issue for **not** using `clear_cache` will just keep getting worse.
+
+### Clear cache = True
+```bash
+python profile_stanza.py --clear-cache --save-fp ./gpu_profile_plots/clear_cache.png
+```
+
+Ignore the time that comes from this as sampling the memory usage takes a long time. To get the time taken to run this script use the script without `--save-fp`:
+
+```bash
+python profile_stanza.py --clear-cache
+```
+
+Time taken: 12.26
+GPU memory usage plot:
+![GPU memory usage vs the number of documents processed](./gpu_profile_plots/clear_cache.png "GPU memory usage vs the number of documents processed")
+
+### Clear cache = False
+```bash
+python profile_stanza.py --save-fp ./gpu_profile_plots/non_clear_cache.png
+```
+
+Ignore the time that comes from this as sampling the memory usage takes a long time. To get the time taken to run this script use the script without `--save-fp`:
+
+```bash
+python profile_stanza.py
+```
+
+Time taken: 11.91
+GPU memory usage plot:
+![GPU memory usage vs the number of documents processed](./gpu_profile_plots/non_clear_cache.png "GPU memory usage vs the number of documents processed")

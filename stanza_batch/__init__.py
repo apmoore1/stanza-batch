@@ -4,6 +4,7 @@ import re
 import stanza
 from stanza.models.common.doc import Document, Sentence
 from stanza.models.tokenize.data import NEWLINE_WHITESPACE_RE
+import torch
 
 # NEWLINE_WHITESPACE_RE = re.compile(r'\n\s*\n') That is what NEWLINE_WHITESPACE_RE
 # is within Stanza
@@ -280,6 +281,7 @@ def batch(
     data: Iterable[str],
     stanza_pipeline: stanza.Pipeline,
     batch_size: int = 32,
+    clear_cache: bool = True,
 ) -> Iterable[Document]:
     """
     Batch processes the given texts using the given Stanza pipeline.
@@ -299,6 +301,11 @@ def batch(
     :param data: A list/iterable of texts you want processing.
     :param stanza_pipeline: The Stanza pipeline used to process the texts.
     :param batch_size: The number of texts to process at one time.
+    :param clear_cache: If True will call the python garbage collector and if
+                        using the GPU will empty the CUDA cache after each
+                        batch has been processed. This is to stop the memory
+                        from being consumed for both the main memory and GPU
+                        memory over the whole python process.
     :returns: An Iterable of processed texts represented as Stanza Documents.
               This will be of the same length as the data iterable given.
     :raises ValueError: If a sample in the data contains no text after being
@@ -345,5 +352,9 @@ def batch(
                 documents_across_batches.append(processed_stanza_document)
             else:
                 yield processed_stanza_document
+        if clear_cache and torch.cuda.is_available():
+            torch.cuda.empty_cache()
     if documents_across_batches:
         yield combine_stanza_documents(documents_across_batches)
+    if clear_cache and torch.cuda.is_available():
+        torch.cuda.empty_cache()
