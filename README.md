@@ -232,6 +232,7 @@ python profile_stanza.py --clear-cache
 Time taken: 12.26
 
 GPU memory usage plot:
+
 ![GPU memory usage vs the number of documents processed](./gpu_profile_plots/clear_cache.png "GPU memory usage vs the number of documents processed")
 
 ### Clear cache = False
@@ -248,4 +249,5 @@ python profile_stanza.py
 Time taken: 11.91
 
 GPU memory usage plot:
+
 ![GPU memory usage vs the number of documents processed](./gpu_profile_plots/non_clear_cache.png "GPU memory usage vs the number of documents processed")
