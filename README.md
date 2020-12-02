@@ -229,7 +229,7 @@ Ignore the time that comes from this as sampling the memory usage takes a long t
 python profile_stanza.py --clear-cache
 ```
 
-Time taken: 12.26
+Time taken: 11.91
 
 GPU memory usage plot:
 
@@ -246,7 +246,7 @@ Ignore the time that comes from this as sampling the memory usage takes a long t
 python profile_stanza.py
 ```
 
-Time taken: 11.91
+Time taken: 11.61
 
 GPU memory usage plot:
 
