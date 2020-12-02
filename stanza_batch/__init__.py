@@ -100,7 +100,7 @@ def _create_stanza_document(
 ) -> Document:
     stanza_document = Document(sentence_dicts, text=document_text)
     for sentence_index, sentence_dict in enumerate(sentence_dicts):
-        sentence_sentiment = sentence_dict[0]["sentiment"]
+        sentence_sentiment = sentence_dict[0]["sentence_sentiment"]
         if sentence_sentiment is not None:
             stanza_document.sentences[
                 sentence_index
@@ -150,7 +150,7 @@ def _batch_to_documents(
                 start = start - start_offset
                 end = end - start_offset
                 token["misc"] = f"start_char={start}|end_char={end}"
-                token["sentiment"] = sentence_sentiment
+                token["sentence_sentiment"] = sentence_sentiment
                 sentence_dicts.append(token)
             all_sentence_dicts.append(sentence_dicts)
         return all_sentence_dicts
@@ -255,7 +255,7 @@ def combine_stanza_documents(stanza_documents: List[Document]) -> Document:
                 start = start + offset_to_add
                 end = end + offset_to_add
                 token["misc"] = f"start_char={start}|end_char={end}"
-                token["sentiment"] = sentence_sentiment
+                token["sentence_sentiment"] = sentence_sentiment
                 sentence_dicts.append(token)
             all_sentence_dicts.append(sentence_dicts)
         return all_sentence_dicts
