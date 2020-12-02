@@ -6,7 +6,6 @@
     <a href="https://github.com/apmoore1/stanza-batch/blob/main/LICENSE"> <img alt="License" src="https://img.shields.io/github/license/apmoore1/stanza-batch"></a>
 </p>
 
-)
 
 Is a batching utility for [Stanza](https://github.com/stanfordnlp/stanza) making processing documents/texts with Stanza quicker and easier. The current recommendation for batching by [Stanza is to concatenate documents together with each document separated by a blank line (`\n\n`)](https://github.com/stanfordnlp/stanza#batching-to-maximize-pipeline-speed). This way of batching has one main drawback:
 
