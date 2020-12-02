@@ -232,8 +232,9 @@ def test_sentiment_in_sentence() -> None:
             assert isinstance(sentence.sentiment, int)
 
 
-@pytest.mark.parametrize("clear_cache", [(True,), (False,)])
-def test_batch(clear_cache: bool) -> None:
+@pytest.mark.parametrize("torch_no_grad", [True, False])
+@pytest.mark.parametrize("clear_cache", [True, False])
+def test_batch(clear_cache: bool, torch_no_grad: bool) -> None:
     stanza.download("en", processors="tokenize")
     nlp = stanza.Pipeline(
         lang="en", processors="tokenize, sentiment", use_gpu=False
@@ -241,7 +242,7 @@ def test_batch(clear_cache: bool) -> None:
     # One sample
     count = 0
     for document in stanza_batch.batch(
-        [EXAMPLE_ONE], nlp, clear_cache=clear_cache
+        [EXAMPLE_ONE], nlp, clear_cache=clear_cache, torch_no_grad=torch_no_grad
     ):
         count += 1
         # This process removes the \n either side of the string
@@ -261,7 +262,10 @@ def test_batch(clear_cache: bool) -> None:
     # middle of the string.
     count = 0
     for document in stanza_batch.batch(
-        [EXAMPLE_FOUR], nlp, clear_cache=clear_cache
+        [EXAMPLE_FOUR],
+        nlp,
+        clear_cache=clear_cache,
+        torch_no_grad=torch_no_grad,
     ):
         count += 1
         # This process removes the `\n \n\n` and adds `\n\n` in its place.
@@ -291,7 +295,11 @@ def test_batch(clear_cache: bool) -> None:
     count = 0
     for index, document in enumerate(
         stanza_batch.batch(
-            documents, nlp, batch_size=2, clear_cache=clear_cache
+            documents,
+            nlp,
+            batch_size=2,
+            clear_cache=clear_cache,
+            torch_no_grad=torch_no_grad,
         )
     ):
         count += 1
@@ -310,7 +318,11 @@ def test_batch(clear_cache: bool) -> None:
     count = 0
     for index, document in enumerate(
         stanza_batch.batch(
-            [long_text], nlp, batch_size=2, clear_cache=clear_cache
+            [long_text],
+            nlp,
+            batch_size=2,
+            clear_cache=clear_cache,
+            torch_no_grad=torch_no_grad,
         )
     ):
         count += 1
@@ -342,7 +354,7 @@ def test_batch(clear_cache: bool) -> None:
     processed_book_data = [
         document
         for document in stanza_batch.batch(
-            book_data, nlp, clear_cache=clear_cache
+            book_data, nlp, clear_cache=clear_cache, torch_no_grad=torch_no_grad
         )
     ]
     assert len(book_data) == len(processed_book_data)

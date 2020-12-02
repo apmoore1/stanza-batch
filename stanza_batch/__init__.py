@@ -282,6 +282,7 @@ def batch(
     stanza_pipeline: stanza.Pipeline,
     batch_size: int = 32,
     clear_cache: bool = True,
+    torch_no_grad: bool = True,
 ) -> Iterable[Document]:
     """
     Batch processes the given texts using the given Stanza pipeline.
@@ -306,6 +307,11 @@ def batch(
                         batch has been processed. This is to stop the memory
                         from being consumed for both the main memory and GPU
                         memory over the whole python process.
+    :param torch_no_grad: This wraps the stanza nlp pipeline in a `torch.no_grad`
+                          context manager, this reduces the memory used by torch
+                          and can speed up the pipeline. This turns off the
+                          autograd engine that is used by PyTorch for the
+                          stanza nlp pipeline when True.
     :returns: An Iterable of processed texts represented as Stanza Documents.
               This will be of the same length as the data iterable given.
     :raises ValueError: If a sample in the data contains no text after being
@@ -318,7 +324,11 @@ def batch(
     for batch_str, _offsets, _doc_indexes in _stanza_batch(
         data, batch_size=batch_size
     ):
-        stanza_document = stanza_pipeline(batch_str)
+        if torch_no_grad:
+            with torch.no_grad():
+                stanza_document = stanza_pipeline(batch_str)
+        else:
+            stanza_document = stanza_pipeline(batch_str)
         (
             processed_stanza_documents,
             processed_document_indexes,
