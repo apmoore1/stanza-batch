@@ -231,9 +231,10 @@ def test_sentiment_in_sentence() -> None:
         for sentence in document.sentences:
             assert isinstance(sentence.sentiment, int)
 
+
 @pytest.mark.parametrize("include_ner", [True, False])
 def test_ents_attribute_in_doc_and_sentence(include_ner: bool) -> None:
-    entity_document = ['Two entities Alice and Bob']
+    entity_document = ["Two entities Alice and Bob"]
     processes = "tokenize"
     if include_ner:
         processes = "tokenize, ner"

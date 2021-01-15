@@ -108,7 +108,7 @@ def _create_stanza_document(
             stanza_document.sentences[
                 sentence_index
             ].sentiment = sentence_sentiment
-        if 'ner' in first_token:
+        if "ner" in first_token:
             contains_entities = True
     if contains_entities:
         stanza_document.build_ents()
