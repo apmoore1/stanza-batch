@@ -102,7 +102,6 @@ def _create_stanza_document(
     contains_entities = False
     for sentence_index, sentence_dict in enumerate(sentence_dicts):
         first_token = sentence_dict[0]
-        print(first_token)
         sentence_sentiment = first_token["sentence_sentiment"]
         if sentence_sentiment is not None:
             stanza_document.sentences[
