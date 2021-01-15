@@ -231,6 +231,25 @@ def test_sentiment_in_sentence() -> None:
         for sentence in document.sentences:
             assert isinstance(sentence.sentiment, int)
 
+@pytest.mark.parametrize("include_ner", [True, False])
+def test_ents_attribute_in_doc_and_sentence(include_ner: bool) -> None:
+    entity_document = ['Two entities Alice and Bob']
+    processes = "tokenize"
+    if include_ner:
+        processes = "tokenize, ner"
+    stanza.download("en", processors=processes)
+    nlp = stanza.Pipeline(lang="en", processors=processes, use_gpu=False)
+    for document in stanza_batch.batch(entity_document, nlp):
+        if include_ner:
+            assert document.ents
+        else:
+            assert not document.ents
+        for sentence in document.sentences:
+            if include_ner:
+                assert sentence.ents
+            else:
+                assert not document.ents
+
 
 @pytest.mark.parametrize("torch_no_grad", [True, False])
 @pytest.mark.parametrize("clear_cache", [True, False])

@@ -99,12 +99,19 @@ def _create_stanza_document(
     sentence_dicts: List[List[Dict[str, str]]], document_text: str
 ) -> Document:
     stanza_document = Document(sentence_dicts, text=document_text)
+    contains_entities = False
     for sentence_index, sentence_dict in enumerate(sentence_dicts):
-        sentence_sentiment = sentence_dict[0]["sentence_sentiment"]
+        first_token = sentence_dict[0]
+        print(first_token)
+        sentence_sentiment = first_token["sentence_sentiment"]
         if sentence_sentiment is not None:
             stanza_document.sentences[
                 sentence_index
             ].sentiment = sentence_sentiment
+        if 'ner' in first_token:
+            contains_entities = True
+    if contains_entities:
+        stanza_document.build_ents()
     return stanza_document
 
 
