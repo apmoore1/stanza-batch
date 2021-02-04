@@ -16,13 +16,15 @@ setup(
     author_email="andrew.p.moore94@gmail.com",
     license="Apache License 2.0",
     install_requires=[
-        "stanza>=1.1.1",
+        "stanza==1.1.1",
     ],
     python_requires=">=3.6.1",
     packages=find_packages(include=["stanza_batch"]),
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8"
     ],
     # Came from the Stanza setup.py
     keywords="natural-language-processing nlp natural-language-understanding stanford-nlp deep-learning",
