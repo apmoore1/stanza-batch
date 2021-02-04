@@ -3,7 +3,12 @@ import re
 
 import stanza
 from stanza.models.common.doc import Document, Sentence
-from stanza.models.tokenize.data import NEWLINE_WHITESPACE_RE
+
+# If Stanza version 1.1
+if stanza.__version__ == "1.1.1":
+    from stanza.models.tokenize.data import NEWLINE_WHITESPACE_RE
+else:
+    from stanza.models.tokenization.data import NEWLINE_WHITESPACE_RE
 import torch
 
 # NEWLINE_WHITESPACE_RE = re.compile(r'\n\s*\n') That is what NEWLINE_WHITESPACE_RE

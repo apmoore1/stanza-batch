@@ -212,7 +212,10 @@ def test_combine_stanza_documents() -> None:
                 combined_doc_text[token.start_char : token.end_char]
                 == token.text
             )
-    assert sentence_count == 5
+    if stanza.__version__ == "1.1.1":
+        assert sentence_count == 5
+    else:
+        assert sentence_count == 4
 
 
 def test_sentiment_in_sentence() -> None:

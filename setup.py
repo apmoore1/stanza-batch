@@ -16,7 +16,7 @@ setup(
     author_email="andrew.p.moore94@gmail.com",
     license="Apache License 2.0",
     install_requires=[
-        "stanza==1.1.1",
+        "stanza>=1.1.1,<=1.2.0",
     ],
     python_requires=">=3.6.1",
     packages=find_packages(include=["stanza_batch"]),

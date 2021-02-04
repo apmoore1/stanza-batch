@@ -5,6 +5,10 @@ jobs:
     strategy:
       matrix:
         python-version: [3.6, 3.7, 3.8]
+        stanza-version: [1.2.0]
+        include:
+          - python-version: 3.7
+            stanza-version: 1.1.1
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -19,6 +23,7 @@ jobs:
           PYTHON=`python -c "import sys; print('.'.join([str(version) for version in sys.version_info[:3]]))"`
           echo "PYTHON=${PYTHON}" >> $GITHUB_ENV
           echo "OS=${{ runner.os }}" >> $GITHUB_ENV
+          echo "STANZA=${{ matrix.stanza-version }}" >> $GITHUB_ENV
       
       - name: Python location
         run: echo "Python location ${{ env.pythonLocation }}"
@@ -27,15 +32,14 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ env.pythonLocation }} # Ubuntu specific  
-          # cache both the dev and standard requirements
-          key: ${{ runner.os }}-${{ env.pythonLocation }}-pip-${{ hashFiles('**/*requirements.txt') }}
+          # cache the dev requirements
+          key: ${{ runner.os }}-${{ env.pythonLocation }}-${{ matrix.stanza-version }}-pip-${{ hashFiles('**/dev-requirements.txt') }}
       
       - name: Install dependencies
-        # We want the pips to be upgraded when a new version comes out so that
-        # the packages do not use stale dependencies from the cache.
+        # Install the correct version of Stanza
         run: |
           python -m pip install --upgrade pip
-          pip install --upgrade --upgrade-strategy eager -r requirements.txt
+          pip install stanza==${{ matrix.stanza-version }}
           pip install --upgrade --upgrade-strategy eager -r dev-requirements.txt
       
       - name: Code format
@@ -51,5 +55,5 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           file: ./coverage.xml
-          env_vars: OS,PYTHON 
+          env_vars: OS,PYTHON,STANZA 
           fail_ci_if_error: false 
