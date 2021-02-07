@@ -6,6 +6,18 @@
     <a href="https://github.com/apmoore1/stanza-batch/blob/main/LICENSE"> <img alt="License" src="https://img.shields.io/github/license/apmoore1/stanza-batch"></a>
 </p>
 
+## Quick links
+
+1. [Introduction](#introduction)
+2. [Installation](#installation)
+3. [Edge cases](#edge-cases)
+4. [Handling Out Of Memory (OOM) errors](#handling-out-of-memory-(oom)-errors)
+5. [Developing/Testing](#developingtesting)
+6. [Memory management](#memory-management)
+7. [Acknowledgements](#acknowledgements)
+
+## Introduction
+
 **Currently supports [Stanza](https://github.com/stanfordnlp/stanza) version 1.1.1 and 1.2.0**
 
 
