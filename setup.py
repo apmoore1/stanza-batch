@@ -1,13 +1,23 @@
 from setuptools import setup, find_packages
+from pathlib import Path
 
+package_dir = Path(Path(__file__).parent).resolve()
 
-with open("README.md", "r") as fh:
+long_description = ""
+with Path(package_dir, "README.md").open("r") as fh:
     long_description = fh.read()
+assert long_description
 
+VERSION = ""
+with Path(package_dir, "stanza_batch", "version.py").open("r") as fh:
+    temp_version = {}
+    exec(fh.read(), None, temp_version)
+    VERSION = temp_version["VERSION"]
+assert VERSION
 
 setup(
     name="stanza_batch",
-    version="0.1.1",
+    version=VERSION,
     description="A batching utility for Stanza",
     long_description=long_description,
     long_description_content_type="text/markdown",

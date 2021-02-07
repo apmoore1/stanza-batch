@@ -14,6 +14,10 @@ EXAMPLE_THREE = "Another day. Hello how are you. Today is great."  # Three sente
 EXAMPLE_FOUR = "\nHello how are you. Great Thanks\n \n\nSomething else\n     \n\nAnother test\n"
 
 
+def test_version() -> None:
+    assert isinstance(stanza_batch.__version__, str)
+
+
 def test__stanza_batch() -> None:
     count = 0
     for batch, offsets, document_index in stanza_batch._stanza_batch(

@@ -11,6 +11,8 @@ else:
     from stanza.models.tokenization.data import NEWLINE_WHITESPACE_RE
 import torch
 
+from stanza_batch.version import VERSION as __version__
+
 # NEWLINE_WHITESPACE_RE = re.compile(r'\n\s*\n') That is what NEWLINE_WHITESPACE_RE
 # is within Stanza
 START_OFFSET_RE = re.compile(r"start_char=(\d+)")

@@ -6,6 +6,8 @@
     <a href="https://github.com/apmoore1/stanza-batch/blob/main/LICENSE"> <img alt="License" src="https://img.shields.io/github/license/apmoore1/stanza-batch"></a>
 </p>
 
+**Currently supports [Stanza](https://github.com/stanfordnlp/stanza) version 1.1.1 and 1.2.0**
+
 
 Is a batching utility for [Stanza](https://github.com/stanfordnlp/stanza) making processing documents/texts with Stanza quicker and easier. The current recommendation for batching by [Stanza is to concatenate documents together with each document separated by a blank line (`\n\n`)](https://github.com/stanfordnlp/stanza#batching-to-maximize-pipeline-speed). This way of batching has one main drawback:
 
@@ -251,3 +253,7 @@ Time taken: 11.61
 GPU memory usage plot:
 
 ![GPU memory usage vs the number of documents processed](./gpu_profile_plots/non_clear_cache.png "GPU memory usage vs the number of documents processed")
+
+## Acknowledgements
+
+This work has been funded through the [UCREL research centre at Lancaster University](http://ucrel.lancs.ac.uk/).
