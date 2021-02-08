@@ -6,12 +6,17 @@
     <a href="https://github.com/apmoore1/stanza-batch/blob/main/LICENSE"> <img alt="License" src="https://img.shields.io/github/license/apmoore1/stanza-batch"></a>
 </p>
 
+<p align="center">
+    <a href="https://pypi.org/project/stanza-batch/"> <img alt="PyPi" src="https://img.shields.io/pypi/v/stanza-batch"> </a>
+    <a href="https://pypi.org/project/stanza-batch/"> <img alt="Supported Python Versions" src="https://img.shields.io/pypi/pyversions/stanza-batch"> </a>
+</p>
+
 ## Quick links
 
 1. [Introduction](#introduction)
 2. [Installation](#installation)
 3. [Edge cases](#edge-cases)
-4. [Handling Out Of Memory (OOM) errors](#handling-out-of-memory-(oom)-errors)
+4. [Handling Out Of Memory (OOM) errors](#handling-out-of-memory-oom-errors)
 5. [Developing/Testing](#developingtesting)
 6. [Memory management](#memory-management)
 7. [Acknowledgements](#acknowledgements)
@@ -67,7 +72,7 @@ As we can see above the new `batch` function yields corresponding processed docu
 Requires Python 3.6.1 or later. As the package depends on [Stanza](https://github.com/stanfordnlp/stanza) which also depends on [PyTorch](https://pytorch.org/) we recommend that you install the version of PyTorch that suits your setup first (e.g. CPU or GPU PyTorch and then if GPU a specific CUDA version).
 
 ``` bash
-pip install .
+pip install stanza-batch
 ```
 
 ## Edge cases
