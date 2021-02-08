@@ -64,13 +64,11 @@ As we can see above the new `batch` function yields corresponding processed docu
 
 ## Installation
 
-Requires Python 3.6.1 or later. As the package depends on [Stanza](https://github.com/stanfordnlp/stanza) which also depends on [Pytorch](https://pytorch.org/) we recommend that you install the version of Pytorch that suits your setup first (e.g. CPU or GPU Pytorch and then if GPU a specific CUDA version).
+Requires Python 3.6.1 or later. As the package depends on [Stanza](https://github.com/stanfordnlp/stanza) which also depends on [PyTorch](https://pytorch.org/) we recommend that you install the version of PyTorch that suits your setup first (e.g. CPU or GPU PyTorch and then if GPU a specific CUDA version).
 
 ``` bash
 pip install .
 ```
-
-Currently it has only been tested for Stanza version `1.1.1`.
 
 ## Edge cases
 
