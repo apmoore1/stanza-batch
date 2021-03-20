@@ -158,11 +158,12 @@ def _batch_to_documents(
             sentence_dicts: List[Dict[str, str]] = []
             sentence_sentiment = getattr(sentence, "sentiment", None)
             for token in sentence.to_dict():
-                token_misc = token["misc"]
-                start, end = _start_end_character_offsets(token_misc)
-                start = start - start_offset
-                end = end - start_offset
-                token["misc"] = f"start_char={start}|end_char={end}"
+                if "misc" in token:
+                    token_misc = token["misc"]
+                    start, end = _start_end_character_offsets(token_misc)
+                    start = start - start_offset
+                    end = end - start_offset
+                    token["misc"] = f"start_char={start}|end_char={end}"
                 token["sentence_sentiment"] = sentence_sentiment
                 sentence_dicts.append(token)
             all_sentence_dicts.append(sentence_dicts)
@@ -263,11 +264,12 @@ def combine_stanza_documents(stanza_documents: List[Document]) -> Document:
             sentence_dicts: List[Dict[str, str]] = []
             sentence_sentiment = getattr(sentence, "sentiment", None)
             for token in sentence.to_dict():
-                token_misc = token["misc"]
-                start, end = _start_end_character_offsets(token_misc)
-                start = start + offset_to_add
-                end = end + offset_to_add
-                token["misc"] = f"start_char={start}|end_char={end}"
+                if "misc" in token:
+                    token_misc = token["misc"]
+                    start, end = _start_end_character_offsets(token_misc)
+                    start = start + offset_to_add
+                    end = end + offset_to_add
+                    token["misc"] = f"start_char={start}|end_char={end}"
                 token["sentence_sentiment"] = sentence_sentiment
                 sentence_dicts.append(token)
             all_sentence_dicts.append(sentence_dicts)
