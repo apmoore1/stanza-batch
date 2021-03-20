@@ -18,6 +18,44 @@ def test_version() -> None:
     assert isinstance(stanza_batch.__version__, str)
 
 
+def test_misc_in_change_offsets() -> None:
+    """
+    Tests that we check if "misc" exists in as a key in token within the
+    change_offsets functions. The change_offsets functions are within
+    the combine_stanza_documents and _batch_to_documents functions.
+    """
+    # For the _batch_to_documents function
+    stanza.download("cs", processors="tokenize,mwt")
+    nlp = stanza.Pipeline(lang="cs", processors="tokenize,mwt", use_gpu=False)
+    sent = "Požádal, aby mu vyhověli."
+    correct_tokens = [
+        [{"id": 1, "text": "Požádal", "misc": "start_char=0|end_char=7"}],
+        [{"id": 2, "text": ",", "misc": "start_char=7|end_char=8"}],
+        [
+            {"id": (3, 4), "text": "aby", "misc": "start_char=9|end_char=12"},
+            {"id": 3, "text": "aby"},
+            {"id": 4, "text": "by"},
+        ],
+        [{"id": 5, "text": "mu", "misc": "start_char=13|end_char=15"}],
+        [{"id": 6, "text": "vyhověli", "misc": "start_char=16|end_char=24"}],
+        [{"id": 7, "text": ".", "misc": "start_char=24|end_char=25"}],
+    ]
+    docs = list(stanza_batch.batch([sent], nlp))
+    assert len(docs) == 1
+    for index, token in enumerate(docs[0].iter_tokens()):
+        correct_token = correct_tokens[index]
+        temp_token = token.to_dict()
+        assert len(temp_token) == len(correct_token)
+        assert temp_token == correct_token
+    # For the combine_stanza_documents function
+    doc = stanza_batch.combine_stanza_documents(docs)
+    for index, token in enumerate(doc.iter_tokens()):
+        correct_token = correct_tokens[index]
+        temp_token = token.to_dict()
+        assert len(temp_token) == len(correct_token)
+        assert temp_token == correct_token
+
+
 def test__stanza_batch() -> None:
     count = 0
     for batch, offsets, document_index in stanza_batch._stanza_batch(
